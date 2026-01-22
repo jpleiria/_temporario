@@ -323,8 +323,14 @@ const highContrastPalette = [
 ];
 
 async function addFreguesias() {
-    // ... fetch data ...
-    L.geoJSON(data, {
+    try {
+        const response = await fetch('freguesias_leiria.geojson');
+        if (!response.ok) return;
+        const data = await response.json();
+
+        let colorIndex = 0;
+
+        L.geoJSON(data, {
         style: function(feature) {
             // Salto de 7 posições na paleta baseado no ID
             const id = feature.id || 0;
@@ -343,6 +349,7 @@ async function addFreguesias() {
         }
     }).addTo(map);
 }
+
 
   function addFireStations() {
         const cbs = [
