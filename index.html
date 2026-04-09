@@ -3,257 +3,195 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SGO Mobile - Operacional</title>
+    <title>SGO Mobile Pro</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        :root { --fire: #d32f2f; --hazmat: #f57c00; --accident: #1976d2; --forest: #388e3c; --dark: #1a1a1a; --footer-bg: #ffffff; }
-        
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: -apple-system, system-ui, sans-serif; background: #f0f2f5; margin: 0; padding: 0; color: #333; }
-
-        /* --- PÁGINA INICIAL (MENU) --- */
-        #main-menu { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
-        .menu-card { background: white; padding: 30px 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; width: 100%; max-width: 400px; }
-        .logo-main { width: 150px; margin-bottom: 20px; }
-        .grid-menu { display: grid; grid-template-columns: 1fr; gap: 12px; width: 100%; }
-        .btn-m { padding: 20px; border: none; border-radius: 12px; color: white; font-weight: bold; font-size: 1rem; cursor: pointer; text-transform: uppercase; transition: background 0.3s; }
-
-        /* --- PÁGINA DE FORMULÁRIO --- */
-        #app-content { display: none; padding-bottom: 160px; /* Espaço para o rodapé fixo */ }
-        .header-app { background: var(--dark); color: white; padding: 15px; position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; }
-        .btn-back { background: rgba(255,255,255,0.2); border: none; color: white; padding: 8px 15px; border-radius: 5px; font-weight: bold; }
-
-        .form-container { padding: 15px; max-width: 600px; margin: auto; }
-        .card { background: white; padding: 18px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 15px; border-top: 6px solid var(--dark); }
-        h2 { font-size: 0.9rem; margin: 0 0 15px 0; color: #555; text-transform: uppercase; border-bottom: 1px solid #eee; padding-bottom: 8px; }
-        
-        .form-group { margin-bottom: 15px; }
-        label { display: block; font-size: 0.75rem; font-weight: 700; color: #666; margin-bottom: 5px; text-transform: uppercase; }
-        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; background: #fff; }
-        input[type="number"] { inputmode: numeric; }
-        
-        .row { display: flex; gap: 10px; }
+        :root { --dark: #1a1a1a; --primary: #d32f2f; }
+        body { font-family: sans-serif; background: #f0f2f5; margin: 0; padding-bottom: 180px; }
+        .page { display: none; padding: 15px; }
+        .active { display: block; }
+        .card { background: white; padding: 15px; border-radius: 10px; margin-bottom: 15px; border-top: 5px solid var(--dark); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        h2 { font-size: 0.85rem; text-transform: uppercase; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        .form-group { margin-bottom: 12px; }
+        label { display: block; font-size: 0.7rem; font-weight: bold; color: #666; margin-bottom: 3px; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 1rem; }
+        .row { display: flex; gap: 8px; }
         .row > div { flex: 1; }
-        
-        .check-item { display: flex; align-items: center; gap: 12px; background: #f8f9fa; padding: 12px; border-radius: 10px; margin-bottom: 8px; border: 1px solid #eee; }
-        .check-item input { width: 24px; height: 24px; }
-
-        /* --- GESTÃO DE FOTOS --- */
-        .photo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        .img-preview { width: 100%; height: 120px; object-fit: cover; border-radius: 10px; border: 1px solid #ddd; }
-
-        /* --- RODAPÉ FIXO (BOTÕES) --- */
-        .footer-actions { position: fixed; bottom: 0; left: 0; right: 0; background: var(--footer-bg); padding: 20px; box-shadow: 0 -5px 15px rgba(0,0,0,0.1); z-index: 1000; display: flex; flex-direction: column; gap: 10px; }
-        .btn-action { width: 100%; padding: 16px; border: none; border-radius: 10px; color: white; font-weight: bold; font-size: 1rem; cursor: pointer; text-align: center; }
-        .bg-pdf { background: #333; }
-        .bg-mail { background: #EA4335; }
-        .btn-reset { background: none; border: none; color: #999; font-size: 0.7rem; text-decoration: underline; margin-top: 5px; }
-
+        .footer { position: fixed; bottom: 0; width: 100%; background: white; padding: 15px; box-shadow: 0 -3px 10px rgba(0,0,0,0.1); display: flex; flex-direction: column; gap: 8px; }
+        .btn { padding: 15px; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; text-align: center; text-decoration: none; }
+        .photo-preview { width: 100%; border-radius: 8px; margin-top: 10px; }
         .hidden { display: none; }
     </style>
 </head>
 <body>
 
-    <div id="main-menu">
-        <div class="menu-card">
-            <img src="logo.png" alt="SGO" class="logo-main">
-            <h1 style="font-size: 1.3rem; margin-bottom: 25px;">GUIA DE COMANDO</h1>
-            <div class="grid-menu">
-                <button class="btn-m" style="background:var(--hazmat)" onclick="abrirPagina('hazmat')">Matérias Perigosas</button>
-                <button class="btn-m" style="background:var(--accident)" onclick="abrirPagina('accident')">Acidentes</button>
-                <button class="btn-m" style="background:var(--fire)" onclick="abrirPagina('urbano')">Incêndios Estruturais</button>
-                <button class="btn-m" style="background:var(--forest)" onclick="abrirPagina('forest')">Incêndios Florestais</button>
-            </div>
+    <div id="menu" class="page active" style="text-align:center;">
+        <img src="logo.png" style="width:120px; margin: 20px;">
+        <div class="card">
+            <h1>SGO - GUIAS FASE I</h1>
+            <button class="btn" style="background:#f57c00; width:100%; margin-bottom:10px;" onclick="showGuia('hazmat')">Matérias Perigosas</button>
+            <button class="btn" style="background:#1976d2; width:100%; margin-bottom:10px;" onclick="showGuia('accident')">Acidentes</button>
+            <button class="btn" style="background:#d32f2f; width:100%; margin-bottom:10px;" onclick="showGuia('urbano')">Incêndios Estruturais</button>
+            <button class="btn" style="background:#388e3c; width:100%;" onclick="showGuia('forest')">Incêndios Florestais</button>
         </div>
     </div>
 
-    <div id="app-content">
-        <div class="header-app">
-            <span id="label-topo" style="font-weight:bold; font-size:0.9rem;">GUIA</span>
-            <button class="btn-back" onclick="voltarMenu()">Sair</button>
-        </div>
-
-        <div class="form-container" id="printable-area">
-            <form id="sgo-form">
-                <input type="hidden" name="guia_ativo" id="guia_ativo">
-                
+    <div id="form-page" class="page">
+        <button onclick="goMenu()" style="border:none; background:none; color:blue; font-weight:bold;">← MENU</button>
+        <div id="print-area">
+            <form id="mainForm">
                 <div class="card">
-                    <h2>Dados da Ocorrência</h2>
+                    <h2 id="guia-title">Guia</h2>
                     <div class="row">
                         <div class="form-group"><label>Nº OCORRÊNCIA</label><input type="text" name="n_ocorr" inputmode="numeric"></div>
-                        <div class="form-group"><label>HORA POSIT</label><input type="time" name="hora_posit"></div>
+                        <div class="form-group"><label>HR POSIT</label><input type="time" name="hora"></div>
                     </div>
-                    <div class="form-group"><label>LOCALIZAÇÃO / COORDENADAS</label><input type="text" name="local"></div>
+                    <div class="form-group"><label>LOCAL/COORDENADAS</label><input type="text" name="local"></div>
                 </div>
 
-                <div id="campos-especificos">
-                    <div id="sec-hazmat" class="hidden">
-                        <div class="card" style="border-top-color: var(--hazmat)">
-                            <h2>Identificação</h2>
-                            <div class="row">
-                                <div class="form-group"><label>Nº Perigo</label><input type="number" name="h_n_per"></div>
-                                <div class="form-group"><label>Nº ONU</label><input type="number" name="h_n_onu"></div>
-                            </div>
-                            <label>Zonamento (m)</label>
-                            <div class="row">
-                                <input type="number" name="z_quente" placeholder="Quente">
-                                <input type="number" name="z_morna" placeholder="Morna">
-                            </div>
+                <div id="campos-hazmat" class="hidden">
+                    <div class="card">
+                        <h2>NRBQ [cite: 191, 228]</h2>
+                        <div class="row">
+                            <div class="form-group"><label>Nº ONU</label><input type="number" name="onu"></div>
+                            <div class="form-group"><label>Nº PERIGO</label><input type="number" name="perigo"></div>
                         </div>
-                    </div>
-
-                    <div id="sec-accident" class="hidden">
-                        <div class="card" style="border-top-color: var(--accident)">
-                            <h2>Vítimas e Perigos</h2>
-                            <div class="row">
-                                <input type="number" name="v_l" placeholder="Leves">
-                                <input type="number" name="v_g" placeholder="Graves">
-                                <input type="number" name="v_o" placeholder="Óbitos">
-                            </div>
-                            <div style="margin-top:15px">
-                                <div class="check-item"><input type="checkbox" name="ac_enc"> Encarcerados</div>
-                                <div class="check-item"><input type="checkbox" name="ac_inc"> Risco Incêndio</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="sec-urbano" class="hidden">
-                        <div class="card" style="border-top-color: var(--fire)">
-                            <h2>Edifício</h2>
-                            <div class="form-group"><label>Tipo Uso</label><input type="text" name="u_uso"></div>
-                            <div class="row">
-                                <div class="form-group"><label>Nº Pisos</label><input type="number" name="u_n_pisos"></div>
-                                <div class="form-group"><label>Piso Fogo</label><input type="number" name="u_p_fogo"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="sec-forest" class="hidden">
-                        <div class="card" style="border-top-color: var(--forest)">
-                            <h2>Comportamento Fogo</h2>
-                            <div class="form-group"><label>Combustível</label><input type="text" name="f_comb"></div>
-                            <div class="row">
-                                <div class="form-group"><label>Declive %</label><input type="number" name="f_dec"></div>
-                                <div class="form-group"><label>Vento</label><input type="text" name="f_vento"></div>
-                            </div>
+                        <div class="form-group"><label>SINTOMAS VÍTIMAS</label><input type="text" name="sintomas" placeholder="Náuseas, tonturas..."></div>
+                        <div class="row">
+                            <div class="form-group"><label>COR MATÉRIA</label><input type="text" name="cor"></div>
+                            <div class="form-group"><label>CHEIRO</label><input type="text" name="cheiro"></div>
                         </div>
                     </div>
                 </div>
 
-                <div class="card">
-                    <h2>Estratégia e Fotos</h2>
-                    <textarea name="estrat" rows="3" placeholder="Plano de ação..."></textarea>
-                    <div class="form-group" style="margin-top:15px">
-                        <label>Anexar Fotos (Câmara/Galeria)</label>
-                        <input type="file" id="foto-input" accept="image/*" multiple style="padding:5px">
-                        <div id="preview-container" class="photo-grid"></div>
+                <div id="campos-accident" class="hidden">
+                    <div class="card">
+                        <h2>VÍTIMAS E ENCARCERAMENTO [cite: 438, 442]</h2>
+                        <div class="row">
+                            <input type="number" name="v_l" placeholder="Leves">
+                            <input type="number" name="v_g" placeholder="Graves">
+                            <input type="number" name="v_o" placeholder="Óbitos">
+                        </div>
+                        <div class="form-group" style="margin-top:10px;">
+                            <label>TIPO ENCARCERAMENTO</label>
+                            <select name="encarc">
+                                <option>Nenhum</option>
+                                <option>Mecânico</option>
+                                <option>Físico Tipo I</option>
+                                <option>Físico Tipo II</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="campos-urbano" class="hidden">
+                    <div class="card">
+                        <h2>CARACTERIZAÇÃO EDIFÍCIO </h2>
+                        <div class="form-group">
+                            <label>TIPO</label>
+                            <select name="edif_tipo">
+                                <option>Habitação</option>
+                                <option>Grande Altura</option>
+                                <option>Hosp./Lar/Escola</option>
+                                <option>Indústria</option>
+                            </select>
+                        </div>
+                        <div class="row">
+                            <div class="form-group"><label>Nº PISOS</label><input type="number" name="pisos"></div>
+                            <div class="form-group"><label>PISO FOGO</label><input type="number" name="piso_f"></div>
+                        </div>
                     </div>
                 </div>
 
                 <div class="card">
-                    <label>Assumo o Comando (COS)</label>
-                    <input type="text" name="cos_nome" required>
+                    <h2>ANEXOS (FOTOS)</h2>
+                    <input type="file" id="photoInput" accept="image/*" multiple>
+                    <div id="gallery"></div>
+                </div>
+
+                <div class="card">
+                    <label>ASSUMO COS (NOME/CAT)</label>
+                    <input type="text" name="cos_id">
                 </div>
             </form>
         </div>
-
-        <div class="footer-actions no-print">
-            <button class="btn-action bg-pdf" onclick="gerarPDF()">💾 GUARDAR PDF COM FOTOS</button>
-            <button class="btn-action bg-mail" onclick="enviarEmail()">✉️ ENVIAR POR EMAIL</button>
-            <center><button class="btn-reset" onclick="limparDados()">Limpar dados desta página</button></center>
+        
+        <div class="footer">
+            <button class="btn" style="background:#333;" onclick="imprimirPDF()">💾 GUARDAR PDF COM FOTOS</button>
+            <button class="btn" style="background:#EA4335;" onclick="enviarEmail()">✉️ ENVIAR POR EMAIL</button>
         </div>
     </div>
 
     <script>
-        const form = document.getElementById('sgo-form');
-
-        // Navegação entre "Páginas"
-        function abrirPagina(guia) {
-            document.getElementById('main-menu').style.display = 'none';
-            document.getElementById('app-content').style.display = 'block';
-            document.getElementById('guia_ativo').value = guia;
-
-            // Mostrar campos específicos
-            const seccoes = ['hazmat', 'accident', 'urbano', 'forest'];
-            seccoes.forEach(s => document.getElementById('sec-' + s).classList.add('hidden'));
-            document.getElementById('sec-' + guia).classList.remove('hidden');
-
-            const titulos = { 'hazmat': 'MATÉRIAS PERIGOSAS', 'accident': 'ACIDENTES', 'urbano': 'INCÊNDIOS ESTRUTURAIS', 'forest': 'INCÊNDIOS FLORESTAIS' };
-            document.getElementById('label-topo').innerText = titulos[guia];
-            window.scrollTo(0,0);
-        }
-
-        function voltarMenu() {
-            if(confirm("Deseja voltar ao menu? Os dados preenchidos estão guardados.")) {
-                document.getElementById('main-menu').style.display = 'flex';
-                document.getElementById('app-content').style.display = 'none';
-            }
-        }
-
-        // Auto-Save ao fechar ou mudar
+        // Lógica de Persistência
+        const form = document.getElementById('mainForm');
         form.addEventListener('input', () => {
             const data = Object.fromEntries(new FormData(form));
-            // Captura também checkboxes
-            form.querySelectorAll('input[type="checkbox"]').forEach(cb => data[cb.name] = cb.checked);
-            localStorage.setItem('sgo_store', JSON.stringify(data));
+            localStorage.setItem('sgo_data', JSON.stringify(data));
         });
 
-        // Carregar dados guardados
         window.onload = () => {
-            const saved = localStorage.getItem('sgo_store');
+            const saved = localStorage.getItem('sgo_data');
             if(saved) {
                 const data = JSON.parse(saved);
-                Object.keys(data).forEach(key => {
-                    const field = form.elements[key];
-                    if(field) {
-                        if(field.type === 'checkbox') field.checked = data[key];
-                        else field.value = data[key];
-                    }
-                });
-                if(data.guia_ativo) abrirPagina(data.guia_ativo);
+                Object.keys(data).forEach(k => { if(form.elements[k]) form.elements[k].value = data[k]; });
             }
         };
 
-        // Gestão de Fotos
-        document.getElementById('foto-input').addEventListener('change', function(e) {
-            const container = document.getElementById('preview-container');
-            for(let file of e.target.files) {
+        function showGuia(tipo) {
+            document.getElementById('menu').classList.remove('active');
+            document.getElementById('form-page').classList.add('active');
+            ['hazmat', 'accident', 'urbano'].forEach(id => document.getElementById('campos-'+id).classList.add('hidden'));
+            if(document.getElementById('campos-'+tipo)) document.getElementById('campos-'+tipo).classList.remove('hidden');
+        }
+
+        function goMenu() {
+            document.getElementById('menu').classList.add('active');
+            document.getElementById('form-page').classList.remove('active');
+        }
+
+        // Lógica de Fotos com Preview
+        document.getElementById('photoInput').addEventListener('change', function(e) {
+            const gallery = document.getElementById('gallery');
+            gallery.innerHTML = '';
+            Array.from(e.target.files).forEach(file => {
                 const reader = new FileReader();
                 reader.onload = (ev) => {
                     const img = document.createElement('img');
                     img.src = ev.target.result;
-                    img.className = 'img-preview';
-                    container.appendChild(img);
+                    img.className = 'photo-preview';
+                    gallery.appendChild(img);
                 };
                 reader.readAsDataURL(file);
-            }
+            });
         });
 
-        // Funções de Saída
-        function gerarPDF() {
-            const element = document.getElementById('printable-area');
+        // Garantia que imagens carregam antes do PDF
+        async function imprimirPDF() {
+            const element = document.getElementById('print-area');
+            const images = element.getElementsByTagName('img');
+            
+            // Aguarda todas as imagens carregarem
+            const promises = Array.from(images).map(img => {
+                if (img.complete) return Promise.resolve();
+                return new Promise(resolve => { img.onload = resolve; img.onerror = resolve; });
+            });
+
+            await Promise.all(promises);
+
             const opt = {
-                margin: 5,
+                margin: 10,
                 filename: `SGO_Relatorio_${Date.now()}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
+                html2canvas: { scale: 2, useCORS: true, logging: false },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
             html2pdf().set(opt).from(element).save();
         }
 
         function enviarEmail() {
-            const subject = "SGO Relatorio - " + document.getElementById('label-topo').innerText;
-            let body = "Dados do Guia:\n\n";
-            new FormData(form).forEach((v, k) => { if(v && v !== 'on') body += `${k.toUpperCase()}: ${v}\n` });
-            window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-        }
-
-        function limparDados() {
-            if(confirm("Apagar todos os campos desta página?")) {
-                localStorage.removeItem('sgo_store');
-                location.reload();
-            }
+            const body = encodeURIComponent("Relatório SGO anexado (gerar PDF primeiro)");
+            window.location.href = `mailto:?subject=SGO_Relatorio&body=${body}`;
         }
     </script>
 </body>
