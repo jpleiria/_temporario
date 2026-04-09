@@ -3,158 +3,201 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SGO Operacional</title>
+
+<title>SGO - Fase I (ANEPC)</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <style>
-body { font-family: system-ui; background:#f4f6f9; margin:0; padding-bottom:120px; }
-.page { display:none; padding:15px; }
-.active { display:block; }
+body {
+    font-family: Arial, sans-serif;
+    background:#e9ecef;
+    margin:0;
+}
 
-.card {
+.container {
+    max-width:900px;
+    margin:auto;
     background:white;
-    border-radius:14px;
-    padding:15px;
+    padding:20px;
+}
+
+h1 {
+    text-align:center;
+    font-size:18px;
+    margin-bottom:20px;
+}
+
+.section {
+    border:1px solid #ccc;
     margin-bottom:15px;
-    box-shadow:0 4px 10px rgba(0,0,0,0.08);
 }
 
-h2 { font-size:1rem; margin-bottom:10px; }
+.section h2 {
+    background:#333;
+    color:white;
+    font-size:14px;
+    padding:5px;
+    margin:0;
+}
+
+.content {
+    padding:10px;
+}
+
+.row {
+    display:flex;
+    gap:10px;
+}
+
 input, select, textarea {
-    width:100%; padding:10px; margin-bottom:10px;
-    border-radius:10px; border:1px solid #ccc;
+    width:100%;
+    padding:8px;
+    margin-top:5px;
+    margin-bottom:10px;
+    border:1px solid #ccc;
+    font-size:13px;
 }
 
-.row { display:flex; gap:10px; }
+textarea { min-height:70px; }
+
 .btn {
-    padding:15px; border:none; border-radius:12px;
-    color:white; font-weight:bold; width:100%;
-    margin-bottom:10px;
+    padding:15px;
+    background:#000;
+    color:white;
+    border:none;
+    width:100%;
+    font-size:16px;
 }
-.footer {
-    position:fixed; bottom:0; width:100%;
-    background:white; padding:10px;
-    box-shadow:0 -3px 10px rgba(0,0,0,0.1);
-}
-.quick-btn {
-    background:#eee; padding:8px; border-radius:8px;
-    margin:3px; display:inline-block; cursor:pointer;
+
+/* impressão */
+@media print {
+    body { background:white; }
 }
 </style>
 </head>
 
 <body>
 
-<!-- MENU -->
-<div id="menu" class="page active">
-<div class="card">
-<h2>SGO Operacional</h2>
+<div class="container" id="print">
 
-<button class="btn" style="background:#f57c00" onclick="showGuia('hazmat')">Matérias Perigosas</button>
-<button class="btn" style="background:#1976d2" onclick="showGuia('accident')">Acidentes</button>
-<button class="btn" style="background:#d32f2f" onclick="showGuia('urbano')">Incêndios Urbanos</button>
-<button class="btn" style="background:#388e3c" onclick="showGuia('forest')">Incêndios Florestais</button>
+<h1>RELATÓRIO SGO - FASE I</h1>
 
-</div>
-</div>
-
-<!-- FORM -->
-<div id="form-page" class="page">
-<button onclick="goMenu()">← MENU</button>
-
-<div id="print-area">
-<form id="mainForm">
-
-<!-- LOCAL -->
-<div class="card">
-<h2>LOCALIZAÇÃO</h2>
+<!-- IDENTIFICAÇÃO -->
+<div class="section">
+<h2>IDENTIFICAÇÃO</h2>
+<div class="content">
 
 <div class="row">
 <input name="n_ocorr" placeholder="Nº Ocorrência">
-<input type="time" name="hora">
+<input type="date" id="data">
+<input type="time" id="hora">
 </div>
 
 <input name="local" placeholder="Local">
 
 <div class="row">
-<input name="coord_n" id="coord_n" placeholder="N">
-<input name="coord_w" id="coord_w" placeholder="W">
+<input name="freguesia" placeholder="Freguesia">
+<input name="concelho" placeholder="Concelho">
 </div>
 
-<button type="button" onclick="getGPS()">📍 Obter GPS</button>
+<div class="row">
+<input id="coord_n" placeholder="Latitude">
+<input id="coord_w" placeholder="Longitude">
 </div>
 
-<!-- ESTOU -->
-<div class="card">
-<h2>ESTOU</h2>
+<button onclick="getGPS()">📍 GPS</button>
+
+</div>
+</div>
+
+<!-- SITUAÇÃO -->
+<div class="section">
+<h2>SITUAÇÃO</h2>
+<div class="content">
+
+<label>ESTOU</label>
 <textarea name="estou"></textarea>
-</div>
 
-<!-- VEJO -->
-<div class="card">
-<h2>VEJO</h2>
+<label>VEJO</label>
 <textarea name="vejo"></textarea>
-</div>
 
-<!-- FAÇO -->
-<div class="card">
-<h2>FAÇO</h2>
-
-<div>
-<span class="quick-btn" onclick="addText('faco','Reconhecimento')">Reconhecimento</span>
-<span class="quick-btn" onclick="addText('faco','Proteção exposições')">Proteção</span>
-<span class="quick-btn" onclick="addText('faco','Estabilização')">Estabilização</span>
-</div>
-
+<label>FAÇO</label>
 <textarea name="faco"></textarea>
-</div>
 
-<!-- SOLICITO -->
-<div class="card">
-<h2>SOLICITO</h2>
-
-<div>
-<span class="quick-btn" onclick="addText('solicito','Reforço meios')">Reforço</span>
-<span class="quick-btn" onclick="addText('solicito','VMER')">VMER</span>
-<span class="quick-btn" onclick="addText('solicito','GNR')">GNR</span>
-</div>
-
+<label>SOLICITO</label>
 <textarea name="solicito"></textarea>
+
+</div>
+</div>
+
+<!-- METEOROLOGIA -->
+<div class="section">
+<h2>METEOROLOGIA</h2>
+<div class="content">
+
+<div class="row">
+<input type="number" placeholder="Temperatura">
+<input type="number" placeholder="Vento km/h">
+</div>
+
+<div class="row">
+<input placeholder="Direção vento">
+<select>
+<option>Sem precipitação</option>
+<option>Chuva</option>
+</select>
+</div>
+
+</div>
+</div>
+
+<!-- VÍTIMAS -->
+<div class="section">
+<h2>VÍTIMAS</h2>
+<div class="content">
+
+<div class="row">
+<input placeholder="Leves">
+<input placeholder="Graves">
+<input placeholder="Mortos">
+</div>
+
+</div>
 </div>
 
 <!-- SITAC -->
-<div class="card">
+<div class="section">
 <h2>SITAC</h2>
+<div class="content">
 <textarea name="sitac"></textarea>
+</div>
 </div>
 
 <!-- COS -->
-<div class="card">
-<h2>COS</h2>
-<input name="cos_nome" placeholder="Nome">
+<div class="section">
+<h2>COMANDO</h2>
+<div class="content">
+
+<input placeholder="Nome COS">
+<input placeholder="Categoria">
+<input placeholder="Contacto">
+
+</div>
 </div>
 
-</form>
-</div>
-
-<div class="footer">
-<button class="btn" style="background:#333" onclick="gerarPDF()">💾 Guardar PDF</button>
-</div>
+<button class="btn" onclick="gerarPDF()">💾 GERAR PDF OFICIAL</button>
 
 </div>
 
 <script>
 
-// NAVEGAÇÃO
-function showGuia(){
-    document.getElementById('menu').classList.remove('active');
-    document.getElementById('form-page').classList.add('active');
-}
-function goMenu(){
-    document.getElementById('menu').classList.add('active');
-    document.getElementById('form-page').classList.remove('active');
-}
+// DATA AUTOMÁTICA
+window.onload = () => {
+    const now = new Date();
+    document.getElementById('data').value = now.toISOString().split('T')[0];
+    document.getElementById('hora').value = now.toTimeString().slice(0,5);
+};
 
 // GPS
 function getGPS(){
@@ -164,25 +207,19 @@ function getGPS(){
     });
 }
 
-// QUICK BUTTON
-function addText(field, text){
-    const el = document.querySelector(`[name=${field}]`);
-    el.value += (el.value ? ", " : "") + text;
-}
-
 // PDF
 function gerarPDF(){
-    const element = document.getElementById('print-area');
+    const element = document.getElementById('print');
 
-    const opt = {
-        margin: 0.5,
-        filename: 'SGO_' + Date.now() + '.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-    };
+    const n = document.querySelector('[name=n_ocorr]').value || "SGO";
+    const file = "SGO_" + n + "_" + Date.now() + ".pdf";
 
-    html2pdf().set(opt).from(element).save();
+    html2pdf().set({
+        margin:0.5,
+        filename:file,
+        html2canvas:{scale:2},
+        jsPDF:{unit:'in', format:'a4'}
+    }).from(element).save();
 }
 
 </script>
