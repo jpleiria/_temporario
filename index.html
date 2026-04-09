@@ -13,23 +13,32 @@
 }
 
 body {
-    font-family: Arial, sans-serif;
+    font-family: system-ui, Arial;
     background: var(--bg);
     margin: 0;
     padding-bottom: 120px;
 }
 
+/* PÁGINAS */
 .page { display:none; padding:15px; }
 .active { display:block; }
 
+/* CARDS */
 .card {
     background: var(--card);
-    border-radius: 12px;
+    border-radius: 14px;
     padding: 15px;
     margin-bottom: 15px;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
 }
 
+/* CORES POR GUIA */
+.hazmat { border-top: 5px solid #f57c00; }
+.accident { border-top: 5px solid #1976d2; }
+.urbano { border-top: 5px solid #d32f2f; }
+.forest { border-top: 5px solid #388e3c; }
+
+/* TEXTOS */
 h2 {
     font-size: 1rem;
     margin-bottom: 10px;
@@ -38,40 +47,43 @@ h2 {
 }
 
 label {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     font-weight: bold;
     color: #555;
 }
 
+/* INPUTS */
 input, select, textarea {
     width: 100%;
-    padding: 10px;
-    border-radius: 8px;
+    padding: 11px;
+    border-radius: 10px;
     border: 1px solid #ccc;
-    margin-top: 4px;
-    margin-bottom: 8px;
+    margin-top: 5px;
+    margin-bottom: 10px;
     font-size: 1rem;
 }
 
+textarea { min-height: 80px; }
+
+/* GRID */
 .row {
     display: flex;
-    gap: 8px;
+    gap: 10px;
 }
+.row > div { flex: 1; }
 
-.row > div {
-    flex: 1;
-}
-
+/* BOTÕES */
 .btn {
     padding: 15px;
     border: none;
-    border-radius: 10px;
+    border-radius: 12px;
     color: white;
     font-weight: bold;
     width: 100%;
     margin-bottom: 10px;
 }
 
+/* FOOTER */
 .footer {
     position: fixed;
     bottom: 0;
@@ -81,9 +93,10 @@ input, select, textarea {
     box-shadow: 0 -3px 10px rgba(0,0,0,0.1);
 }
 
+/* FOTO */
 .photo-preview {
     width: 100%;
-    border-radius: 8px;
+    border-radius: 10px;
     margin-top: 10px;
 }
 </style>
@@ -93,14 +106,15 @@ input, select, textarea {
 
 <!-- MENU -->
 <div id="menu" class="page active">
-    <div class="card">
-        <h2>SGO - GUIAS</h2>
+<div class="card">
+<h2>SGO - GUIAS FASE I</h2>
 
-        <button class="btn" style="background:#f57c00" onclick="showGuia('hazmat')">Matérias Perigosas</button>
-        <button class="btn" style="background:#1976d2" onclick="showGuia('accident')">Acidentes</button>
-        <button class="btn" style="background:#d32f2f" onclick="showGuia('urbano')">Incêndios Urbanos</button>
-        <button class="btn" style="background:#388e3c" onclick="showGuia('forest')">Incêndios Florestais</button>
-    </div>
+<button class="btn" style="background:#f57c00" onclick="showGuia('hazmat')">☣️ Matérias Perigosas</button>
+<button class="btn" style="background:#1976d2" onclick="showGuia('accident')">🚗 Acidentes</button>
+<button class="btn" style="background:#d32f2f" onclick="showGuia('urbano')">🏢 Incêndios Urbanos</button>
+<button class="btn" style="background:#388e3c" onclick="showGuia('forest')">🌲 Incêndios Florestais</button>
+
+</div>
 </div>
 
 <!-- FORM -->
@@ -111,15 +125,16 @@ input, select, textarea {
 <form id="mainForm">
 
 <!-- LOCALIZAÇÃO -->
-<div class="card">
+<div class="card" id="topCard">
 <h2>📍 LOCALIZAÇÃO</h2>
 
 <div class="row">
 <input name="n_ocorr" placeholder="Nº Ocorrência">
-<input type="time" name="hora">
+<input type="time" name="hora_posit">
 </div>
 
 <input name="local" placeholder="Local">
+
 <div class="row">
 <input name="freguesia" placeholder="Freguesia">
 <input name="concelho" placeholder="Concelho">
@@ -131,12 +146,13 @@ input, select, textarea {
 </div>
 
 <input name="canal" placeholder="Canal Manobra">
+
 </div>
 
-<!-- SITUAÇÃO -->
+<!-- ESTOU -->
 <div class="card">
-<h2>🚨 SITUAÇÃO (ESTOU)</h2>
-<textarea name="situacao"></textarea>
+<h2>🚨 ESTOU</h2>
+<textarea name="estou"></textarea>
 </div>
 
 <!-- VEJO -->
@@ -189,7 +205,7 @@ input, select, textarea {
 </div>
 
 <!-- HAZMAT -->
-<div id="hazmat" class="card" style="display:none">
+<div id="hazmat" class="card hazmat" style="display:none">
 <h2>☣️ MATÉRIAS PERIGOSAS</h2>
 
 <div class="row">
@@ -198,19 +214,19 @@ input, select, textarea {
 </div>
 
 <input name="substancia" placeholder="Substância">
-<input name="quantidade" placeholder="Quantidade">
+<input name="quantidade" placeholder="Quantidade estimada">
 
 <div class="row">
 <input name="cor" placeholder="Cor">
 <input name="cheiro" placeholder="Cheiro">
 </div>
 
-<textarea name="sintomas" placeholder="Sintomas"></textarea>
+<textarea name="sintomas" placeholder="Sintomas vítimas"></textarea>
 
 </div>
 
 <!-- ACIDENTES -->
-<div id="accident" class="card" style="display:none">
+<div id="accident" class="card accident" style="display:none">
 <h2>🚗 ACIDENTE</h2>
 
 <select name="tipo_acidente">
@@ -231,7 +247,7 @@ input, select, textarea {
 </div>
 
 <!-- URBANO -->
-<div id="urbano" class="card" style="display:none">
+<div id="urbano" class="card urbano" style="display:none">
 <h2>🏢 INCÊNDIO URBANO</h2>
 
 <select name="tipo_edificio">
@@ -249,7 +265,7 @@ input, select, textarea {
 </div>
 
 <!-- FLORESTAL -->
-<div id="forest" class="card" style="display:none">
+<div id="forest" class="card forest" style="display:none">
 <h2>🌲 INCÊNDIO FLORESTAL</h2>
 
 <select name="combustivel">
@@ -295,14 +311,14 @@ input, select, textarea {
 </form>
 
 <div class="footer">
-<button class="btn" style="background:#333">Guardar PDF</button>
+<button class="btn" style="background:#333">💾 Guardar (em breve PDF)</button>
 </div>
 
 </div>
 
 <script>
 
-// NAVEGAÇÃO
+// GUIA ATIVO (cor dinâmica)
 function showGuia(tipo){
     document.getElementById('menu').classList.remove('active');
     document.getElementById('form-page').classList.add('active');
@@ -312,14 +328,17 @@ function showGuia(tipo){
     });
 
     document.getElementById(tipo).style.display='block';
+
+    document.getElementById('topCard').className = "card " + tipo;
 }
 
+// MENU
 function goMenu(){
     document.getElementById('menu').classList.add('active');
     document.getElementById('form-page').classList.remove('active');
 }
 
-// PERSISTÊNCIA
+// PERSISTÊNCIA (CORRIGIDA)
 const form = document.getElementById('mainForm');
 
 form.addEventListener('input', ()=>{
@@ -344,6 +363,7 @@ window.onload = ()=>{
 document.getElementById('photoInput').addEventListener('change', function(e){
     const gallery = document.getElementById('gallery');
     gallery.innerHTML = '';
+
     Array.from(e.target.files).forEach(file=>{
         const reader = new FileReader();
         reader.onload = (ev)=>{
