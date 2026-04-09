@@ -3,101 +3,43 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SGO Mobile Pro</title>
+<title>SGO Operacional</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <style>
-:root {
-    --bg: #f4f6f9;
-    --card: #ffffff;
-    --text: #222;
-}
-
-body {
-    font-family: system-ui, Arial;
-    background: var(--bg);
-    margin: 0;
-    padding-bottom: 120px;
-}
-
-/* PÁGINAS */
+body { font-family: system-ui; background:#f4f6f9; margin:0; padding-bottom:120px; }
 .page { display:none; padding:15px; }
 .active { display:block; }
 
-/* CARDS */
 .card {
-    background: var(--card);
-    border-radius: 14px;
-    padding: 15px;
-    margin-bottom: 15px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    background:white;
+    border-radius:14px;
+    padding:15px;
+    margin-bottom:15px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.08);
 }
 
-/* CORES POR GUIA */
-.hazmat { border-top: 5px solid #f57c00; }
-.accident { border-top: 5px solid #1976d2; }
-.urbano { border-top: 5px solid #d32f2f; }
-.forest { border-top: 5px solid #388e3c; }
-
-/* TEXTOS */
-h2 {
-    font-size: 1rem;
-    margin-bottom: 10px;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 5px;
-}
-
-label {
-    font-size: 0.9rem;
-    font-weight: bold;
-    color: #555;
-}
-
-/* INPUTS */
+h2 { font-size:1rem; margin-bottom:10px; }
 input, select, textarea {
-    width: 100%;
-    padding: 11px;
-    border-radius: 10px;
-    border: 1px solid #ccc;
-    margin-top: 5px;
-    margin-bottom: 10px;
-    font-size: 1rem;
+    width:100%; padding:10px; margin-bottom:10px;
+    border-radius:10px; border:1px solid #ccc;
 }
 
-textarea { min-height: 80px; }
-
-/* GRID */
-.row {
-    display: flex;
-    gap: 10px;
-}
-.row > div { flex: 1; }
-
-/* BOTÕES */
+.row { display:flex; gap:10px; }
 .btn {
-    padding: 15px;
-    border: none;
-    border-radius: 12px;
-    color: white;
-    font-weight: bold;
-    width: 100%;
-    margin-bottom: 10px;
+    padding:15px; border:none; border-radius:12px;
+    color:white; font-weight:bold; width:100%;
+    margin-bottom:10px;
 }
-
-/* FOOTER */
 .footer {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    background: white;
-    padding: 10px;
-    box-shadow: 0 -3px 10px rgba(0,0,0,0.1);
+    position:fixed; bottom:0; width:100%;
+    background:white; padding:10px;
+    box-shadow:0 -3px 10px rgba(0,0,0,0.1);
 }
-
-/* FOTO */
-.photo-preview {
-    width: 100%;
-    border-radius: 10px;
-    margin-top: 10px;
+.quick-btn {
+    background:#eee; padding:8px; border-radius:8px;
+    margin:3px; display:inline-block; cursor:pointer;
 }
 </style>
 </head>
@@ -107,274 +49,141 @@ textarea { min-height: 80px; }
 <!-- MENU -->
 <div id="menu" class="page active">
 <div class="card">
-<h2>SGO - GUIAS FASE I</h2>
+<h2>SGO Operacional</h2>
 
-<button class="btn" style="background:#f57c00" onclick="showGuia('hazmat')">☣️ Matérias Perigosas</button>
-<button class="btn" style="background:#1976d2" onclick="showGuia('accident')">🚗 Acidentes</button>
-<button class="btn" style="background:#d32f2f" onclick="showGuia('urbano')">🏢 Incêndios Urbanos</button>
-<button class="btn" style="background:#388e3c" onclick="showGuia('forest')">🌲 Incêndios Florestais</button>
+<button class="btn" style="background:#f57c00" onclick="showGuia('hazmat')">Matérias Perigosas</button>
+<button class="btn" style="background:#1976d2" onclick="showGuia('accident')">Acidentes</button>
+<button class="btn" style="background:#d32f2f" onclick="showGuia('urbano')">Incêndios Urbanos</button>
+<button class="btn" style="background:#388e3c" onclick="showGuia('forest')">Incêndios Florestais</button>
 
 </div>
 </div>
 
 <!-- FORM -->
 <div id="form-page" class="page">
-
 <button onclick="goMenu()">← MENU</button>
 
+<div id="print-area">
 <form id="mainForm">
 
-<!-- LOCALIZAÇÃO -->
-<div class="card" id="topCard">
-<h2>📍 LOCALIZAÇÃO</h2>
+<!-- LOCAL -->
+<div class="card">
+<h2>LOCALIZAÇÃO</h2>
 
 <div class="row">
 <input name="n_ocorr" placeholder="Nº Ocorrência">
-<input type="time" name="hora_posit">
+<input type="time" name="hora">
 </div>
 
 <input name="local" placeholder="Local">
 
 <div class="row">
-<input name="freguesia" placeholder="Freguesia">
-<input name="concelho" placeholder="Concelho">
+<input name="coord_n" id="coord_n" placeholder="N">
+<input name="coord_w" id="coord_w" placeholder="W">
 </div>
 
-<div class="row">
-<input name="coord_n" placeholder="Coordenada N">
-<input name="coord_w" placeholder="Coordenada W">
-</div>
-
-<input name="canal" placeholder="Canal Manobra">
-
+<button type="button" onclick="getGPS()">📍 Obter GPS</button>
 </div>
 
 <!-- ESTOU -->
 <div class="card">
-<h2>🚨 ESTOU</h2>
+<h2>ESTOU</h2>
 <textarea name="estou"></textarea>
 </div>
 
 <!-- VEJO -->
 <div class="card">
-<h2>👁️ VEJO</h2>
+<h2>VEJO</h2>
 <textarea name="vejo"></textarea>
 </div>
 
 <!-- FAÇO -->
 <div class="card">
-<h2>🛠️ FAÇO</h2>
+<h2>FAÇO</h2>
+
+<div>
+<span class="quick-btn" onclick="addText('faco','Reconhecimento')">Reconhecimento</span>
+<span class="quick-btn" onclick="addText('faco','Proteção exposições')">Proteção</span>
+<span class="quick-btn" onclick="addText('faco','Estabilização')">Estabilização</span>
+</div>
+
 <textarea name="faco"></textarea>
 </div>
 
 <!-- SOLICITO -->
 <div class="card">
-<h2>📞 SOLICITO</h2>
+<h2>SOLICITO</h2>
+
+<div>
+<span class="quick-btn" onclick="addText('solicito','Reforço meios')">Reforço</span>
+<span class="quick-btn" onclick="addText('solicito','VMER')">VMER</span>
+<span class="quick-btn" onclick="addText('solicito','GNR')">GNR</span>
+</div>
+
 <textarea name="solicito"></textarea>
-</div>
-
-<!-- METEO -->
-<div class="card">
-<h2>🌦️ METEOROLOGIA</h2>
-
-<div class="row">
-<input type="number" name="temp" placeholder="Temperatura ºC">
-<input type="number" name="vento_vel" placeholder="Vento km/h">
-</div>
-
-<div class="row">
-<input name="vento_dir" placeholder="Direção vento">
-<select name="precipitacao">
-<option>Sem precipitação</option>
-<option>Chuva</option>
-</select>
-</div>
-
-</div>
-
-<!-- VÍTIMAS -->
-<div class="card">
-<h2>🚑 VÍTIMAS</h2>
-
-<div class="row">
-<input type="number" name="v_leves" placeholder="Leves">
-<input type="number" name="v_graves" placeholder="Graves">
-<input type="number" name="v_mortos" placeholder="Mortos">
-</div>
-
-</div>
-
-<!-- HAZMAT -->
-<div id="hazmat" class="card hazmat" style="display:none">
-<h2>☣️ MATÉRIAS PERIGOSAS</h2>
-
-<div class="row">
-<input name="onu" placeholder="Nº ONU">
-<input name="perigo" placeholder="Nº Perigo">
-</div>
-
-<input name="substancia" placeholder="Substância">
-<input name="quantidade" placeholder="Quantidade estimada">
-
-<div class="row">
-<input name="cor" placeholder="Cor">
-<input name="cheiro" placeholder="Cheiro">
-</div>
-
-<textarea name="sintomas" placeholder="Sintomas vítimas"></textarea>
-
-</div>
-
-<!-- ACIDENTES -->
-<div id="accident" class="card accident" style="display:none">
-<h2>🚗 ACIDENTE</h2>
-
-<select name="tipo_acidente">
-<option>Despiste</option>
-<option>Colisão</option>
-<option>Outro</option>
-</select>
-
-<input name="veiculos" placeholder="Nº Veículos">
-
-<select name="encarceramento">
-<option>Nenhum</option>
-<option>Mecânico</option>
-<option>Físico Tipo I</option>
-<option>Físico Tipo II</option>
-</select>
-
-</div>
-
-<!-- URBANO -->
-<div id="urbano" class="card urbano" style="display:none">
-<h2>🏢 INCÊNDIO URBANO</h2>
-
-<select name="tipo_edificio">
-<option>Habitação</option>
-<option>Indústria</option>
-<option>Comércio</option>
-</select>
-
-<select name="estado_incendio">
-<option>Ativo</option>
-<option>Dominado</option>
-<option>Extinto</option>
-</select>
-
-</div>
-
-<!-- FLORESTAL -->
-<div id="forest" class="card forest" style="display:none">
-<h2>🌲 INCÊNDIO FLORESTAL</h2>
-
-<select name="combustivel">
-<option>Pinhal</option>
-<option>Eucaliptal</option>
-<option>Agrícola</option>
-</select>
-
-<select name="intensidade">
-<option>Fraca</option>
-<option>Média</option>
-<option>Forte</option>
-</select>
-
-<select name="declive">
-<option>Plano</option>
-<option>Moderado</option>
-<option>Acentuado</option>
-</select>
-
 </div>
 
 <!-- SITAC -->
 <div class="card">
-<h2>🧠 SITAC</h2>
+<h2>SITAC</h2>
 <textarea name="sitac"></textarea>
 </div>
 
 <!-- COS -->
 <div class="card">
-<h2>👨‍🚒 COS</h2>
+<h2>COS</h2>
 <input name="cos_nome" placeholder="Nome">
-<input name="cos_categoria" placeholder="Categoria">
-</div>
-
-<!-- FOTOS -->
-<div class="card">
-<h2>📷 FOTOS</h2>
-<input type="file" id="photoInput" multiple>
-<div id="gallery"></div>
 </div>
 
 </form>
+</div>
 
 <div class="footer">
-<button class="btn" style="background:#333">💾 Guardar (em breve PDF)</button>
+<button class="btn" style="background:#333" onclick="gerarPDF()">💾 Guardar PDF</button>
 </div>
 
 </div>
 
 <script>
 
-// GUIA ATIVO (cor dinâmica)
-function showGuia(tipo){
+// NAVEGAÇÃO
+function showGuia(){
     document.getElementById('menu').classList.remove('active');
     document.getElementById('form-page').classList.add('active');
-
-    ['hazmat','accident','urbano','forest'].forEach(id=>{
-        document.getElementById(id).style.display='none';
-    });
-
-    document.getElementById(tipo).style.display='block';
-
-    document.getElementById('topCard').className = "card " + tipo;
 }
-
-// MENU
 function goMenu(){
     document.getElementById('menu').classList.add('active');
     document.getElementById('form-page').classList.remove('active');
 }
 
-// PERSISTÊNCIA (CORRIGIDA)
-const form = document.getElementById('mainForm');
-
-form.addEventListener('input', ()=>{
-    const data = {};
-    [...form.elements].forEach(el=>{
-        if(el.name) data[el.name] = el.value;
+// GPS
+function getGPS(){
+    navigator.geolocation.getCurrentPosition(pos=>{
+        document.getElementById('coord_n').value = pos.coords.latitude.toFixed(6);
+        document.getElementById('coord_w').value = pos.coords.longitude.toFixed(6);
     });
-    localStorage.setItem('sgo_data', JSON.stringify(data));
-});
+}
 
-window.onload = ()=>{
-    const saved = localStorage.getItem('sgo_data');
-    if(saved){
-        const data = JSON.parse(saved);
-        Object.keys(data).forEach(k=>{
-            if(form.elements[k]) form.elements[k].value = data[k];
-        });
-    }
-};
+// QUICK BUTTON
+function addText(field, text){
+    const el = document.querySelector(`[name=${field}]`);
+    el.value += (el.value ? ", " : "") + text;
+}
 
-// FOTOS
-document.getElementById('photoInput').addEventListener('change', function(e){
-    const gallery = document.getElementById('gallery');
-    gallery.innerHTML = '';
+// PDF
+function gerarPDF(){
+    const element = document.getElementById('print-area');
 
-    Array.from(e.target.files).forEach(file=>{
-        const reader = new FileReader();
-        reader.onload = (ev)=>{
-            const img = document.createElement('img');
-            img.src = ev.target.result;
-            img.className = 'photo-preview';
-            gallery.appendChild(img);
-        };
-        reader.readAsDataURL(file);
-    });
-});
+    const opt = {
+        margin: 0.5,
+        filename: 'SGO_' + Date.now() + '.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opt).from(element).save();
+}
 
 </script>
 
