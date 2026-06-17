@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Canais de Rádio - Central V5</title>
+    <style>
+        :root {
+            --cor-disponivel: #2ecc71;
+            --cor-reservado: #f1c40f;
+            --cor-ocupado: #e74c3c;
+            --cor-texto-escuro: #2c3e50;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 20px;
+            color: var(--cor-texto-escuro);
+        }
+
+        .header-central {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #1a252f;
+            margin: 0 0 10px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Controlos do Painel (Botão e Legenda) */
+        .controlos-painel {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto 20px auto;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .legenda {
+            display: flex;
+            gap: 20px;
+            font-weight: bold;
+        }
+
+        .legenda-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .quadrado-cor {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        /* Botão de Expandir / Contrair */
+        .btn-toggle-visao {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1em;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-toggle-visao:hover { background-color: #2980b9; }
+
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 900px) {
+            .dashboard-container { grid-template-columns: 1fr; }
+        }
+
+        .rede-coluna {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .rede-titulo {
+            text-align: center;
+            background-color: #2c3e50;
+            color: white;
+            padding: 10px;
+            margin-top: 0;
+            border-radius: 4px;
+        }
+
+        .categoria-seccao {
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        /* Esconder secções vazias no modo reduzido */
+        .categoria-seccao.hidden { display: none; }
+
+        .categoria-titulo {
+            font-size: 1.2em;
+            border-bottom: 2px solid #eceff1;
+            padding-bottom: 5px;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+        }
+
+        .canais-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px;
+        }
+
+        .canal-card {
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .canal-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        /* Classes de Estado Visuais */
+        .disponivel { background-color: var(--cor-disponivel); color: white; }
+        .reservado { background-color: var(--cor-reservado); color: #2c3e50; }
+        .ocupado { background-color: var(--cor-ocupado); color: white; }
+
+        /* Ocultação de canais disponíveis no Modo Reduzido */
+        .modo-reduzido .disponivel { display: none; }
+
+        .detalhe-card {
+            display: block;
+            font-size: 0.8em;
+            font-weight: normal;
+            margin-top: 5px;
+            background: rgba(0, 0, 0, 0.12);
+            padding: 2px 5px;
+            border-radius: 3px;
+            word-break: break-word;
+        }
+        .reservado .detalhe-card { background: rgba(255, 255, 255, 0.6); }
+
+        /* Janela Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+            z-index: 1000;
+        }
+
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        .modal-content h3 { margin-top: 0; color: #2c3e50; }
+
+        .modal-input {
+            width: 100%;
+            padding: 10px;
+            margin: 15px 0;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+
+        .modal-botoes { display: flex; flex-direction: column; gap: 10px; }
+
+        .btn { padding: 12px; border: none; border-radius: 4px; font-size: 1em; font-weight: bold; cursor: pointer; color: white; }
+        .btn-ocupar { background-color: var(--cor-ocupado); }
+        .btn-reservar { background-color: var(--cor-reservado); color: #2c3e50; }
+        .btn-atualizar { background-color: #2980b9; }
+        .btn-libertar { background-color: #34495e; }
+        .btn-cancelar { background-color: #95a5a6; }
+        
+        .aviso-vazio {
+            grid-column: 1 / -1;
+            text-align: center;
+            color: #95a5a6;
+            font-style: italic;
+            padding: 15px;
+        }
+    </style>
+</head>
+<body class="modo-reduzido"> <div class="header-central">
+        <h1>🎙️ Gestão de Canais de Rádio - Central</h1>
+    </div>
+    
+    <div class="controlos-painel">
+        <button class="btn-toggle-visao" id="btnVisao" onclick="toggleVisao()">👁️ Expandir Painel Completo</button>
+        
+        <div class="legenda">
+            <div class="legenda-item"><div class="quadrado-cor" style="background-color: var(--cor-disponivel);"></div> Disponível</div>
+            <div class="legenda-item"><div class="quadrado-cor" style="background-color: var(--cor-reservado);"></div> Reservado</div>
+            <div class="legenda-item"><div class="quadrado-cor" style="background-color: var(--cor-ocupado);"></div> Ocupado</div>
+        </div>
+    </div>
+
+    <div class="dashboard-container" id="conteudoPainel">
+        <div class="rede-coluna" id="col-muni">
+            <h2 class="rede-titulo">🏛️ Rede Municipal</h2>
+            <div class="categoria-seccao" id="seccao-muni-manobra"><div class="categoria-titulo">Manobra</div><div class="canais-grid" id="muni-manobra"></div></div>
+            <div class="categoria-seccao" id="seccao-muni-tatico"><div class="categoria-titulo">Tático</div><div class="canais-grid" id="muni-tatico"></div></div>
+            <div class="categoria-seccao" id="seccao-muni-comando"><div class="categoria-titulo">Comando</div><div class="canais-grid" id="muni-comando"></div></div>
+        </div>
+
+        <div class="rede-coluna" id="col-anepc">
+            <h2 class="rede-titulo">🚒 Rede ANEPC</h2>
+            <div class="categoria-seccao" id="seccao-anepc-manobra"><div class="categoria-titulo">Manobra</div><div class="canais-grid" id="anepc-manobra"></div></div>
+            <div class="categoria-seccao" id="seccao-anepc-tatico"><div class="categoria-titulo">Tático</div><div class="canais-grid" id="anepc-tatico"></div></div>
+            <div class="categoria-seccao" id="seccao-anepc-comando"><div class="categoria-titulo">Comando</div><div class="canais-grid" id="anepc-comando"></div></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalCanal">
+        <div class="modal-content">
+            <h3 id="modalTitulo">Configurar Canal</h3>
+            <div>
+                <label for="txtOcorrencia">Identificação / Legenda da Ocorrência:</label>
+                <input type="text" id="txtOcorrencia" class="modal-input" placeholder="Ex: Incêndio Urbano #104">
+            </div>
+            <div class="modal-botoes">
+                <button class="btn btn-ocupar" id="btnOcupar">Marcar Ocupado (Vermelho)</button>
+                <button class="btn btn-reservar" id="btnReservar">Marcar Reservado (Amarelo)</button>
+                <button class="btn btn-atualizar" id="btnAtualizar">Atualizar Legenda</button>
+                <button class="btn btn-libertar" id="btnLibertar">Libertar Canal (Verde)</button>
+                <button class="btn btn-cancelar" id="btnCancelar">Voltar / Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const configuracaoCanais = [
+            { rede: 'muni', categoria: 'manobra', prefixo: 'Manobra', max: 7 },
+            { rede: 'muni', categoria: 'tatico', prefixo: 'Tático', max: 5 },
+            { rede: 'muni', categoria: 'comando', prefixo: 'Comando', max: 5 },
+            { rede: 'anepc', categoria: 'manobra', prefixo: 'Manobra', max: 7 },
+            { rede: 'anepc', categoria: 'tatico', prefixo: 'Tático', max: 5 },
+            { rede: 'anepc', categoria: 'comando', prefixo: 'Comando', max: 5 }
+        ];
+
+        let estadoCanais = JSON.parse(localStorage.getItem('sistema_canais_radio_v5')) || {};
+        let idCanalSelecionado = null;
+        let nomeCanalSelecionado = "";
+        let modoExpandido = false;
+
+        const modal = document.getElementById('modalCanal');
+        const modalTitulo = document.getElementById('modalTitulo');
+        const txtOcorrencia = document.getElementById('txtOcorrencia');
+        const btnOcupar = document.getElementById('btnOcupar');
+        const btnReservar = document.getElementById('btnReservar');
+        const btnAtualizar = document.getElementById('btnAtualizar');
+        const btnLibertar = document.getElementById('btnLibertar');
+        const btnCancelar = document.getElementById('btnCancelar');
+
+        // Renderizar Canais e carregar estado guardado
+        configuracaoCanais.forEach(conf => {
+            const container = document.getElementById(`${conf.rede}-${conf.categoria}`);
+            for (let i = 1; i <= conf.max; i++) {
+                const idUnico = `${conf.rede}_${conf.categoria}_${i}`;
+                const nomeExibicao = `${conf.prefixo} ${i}`;
+                
+                const card = document.createElement('div');
+                card.id = idUnico;
+                
+                if (estadoCanais[idUnico] && estadoCanais[idUnico].estado !== 'disponivel') {
+                    card.className = `canal-card ${estadoCanais[idUnico].estado}`;
+                    card.innerHTML = `${nomeExibicao} <span class="detalhe-card">${estadoCanais[idUnico].ocorrencia}</span>`;
+                } else {
+                    card.className = 'canal-card disponivel';
+                    card.innerText = nomeExibicao;
+                    estadoCanais[idUnico] = { estado: 'disponivel', ocorrencia: '' };
+                }
+                
+                card.addEventListener('click', () => abrirModal(idUnico, nomeExibicao));
+                container.appendChild(card);
+            }
+        });
+
+        function salvarDados() {
+            localStorage.setItem('sistema_canais_radio_v5', JSON.stringify(estadoCanais));
+            verificarCategoriasVazias();
+        }
+
+        // Alternar visualização (Reduzida vs Expandida)
+        function toggleVisao() {
+            modoExpandido = !modoExpandido;
+            const body = document.body;
+            const btn = document.getElementById('btnVisao');
+            
+            if (modoExpandido) {
+                body.classList.remove('modo-reduzido');
+                btn.innerText = "👁️ Recolher para Canais Ativos";
+            } else {
+                body.classList.add('modo-reduzido');
+                btn.innerText = "👁️ Expandir Painel Completo";
+            }
+            verificarCategoriasVazias();
+        }
+
+        // Verifica e oculta secções inteiras se não houver canais ativos nelas (Modo Reduzido)
+        function verificarCategoriasVazias() {
+            configuracaoCanais.forEach(conf => {
+                const seccao = document.getElementById(`seccao-${conf.rede}-${conf.categoria}`);
+                const grid = document.getElementById(`${conf.rede}-${conf.categoria}`);
+                
+                // Remove avisos antigos de vazio
+                const avisoAntigo = grid.querySelector('.aviso-vazio');
+                if (avisoAntigo) avisoAntigo.remove();
+
+                if (!modoExpandido) {
+                    // Contar quantos ativos existem nesta categoria
+                    let ativos = 0;
+                    for (let i = 1; i <= conf.max; i++) {
+                        const idUnico = `${conf.rede}_${conf.categoria}_${i}`;
+                        if (estadoCanais[idUnico].estado !== 'disponivel') ativos++;
+                    }
+                    
+                    if (ativos === 0) {
+                        seccao.classList.add('hidden');
+                    } else {
+                        seccao.classList.remove('hidden');
+                    }
+                } else {
+                    seccao.classList.remove('hidden');
+                }
+            });
+        }
+
+        function abrirModal(idUnico, nomeExibicao) {
+            idCanalSelecionado = idUnico;
+            nomeCanalSelecionado = nomeExibicao;
+            modalTitulo.innerText = `Gerir: ${nomeExibicao}`;
+            
+            const canalAtual = estadoCanais[idUnico];
+            txtOcorrencia.value = canalAtual.ocorrencia;
+
+            if (canalAtual.estado === 'disponivel') {
+                btnOcupar.style.display = "block";
+                btnReservar.style.display = "block";
+                btnAtualizar.style.display = "none";
+                btnLibertar.style.display = "none";
+            } else {
+                // Se já estiver em uso, permite atualizar legenda ou libertar
+                btnOcupar.style.display = "none";
+                btnReservar.style.display = "none";
+                btnAtualizar.style.display = "block";
+                btnLibertar.style.display = "block";
+            }
+
+            modal.classList.add('active');
+        }
+
+        function fecharModal() {
+            modal.classList.remove('active');
+            idCanalSelecionado = null;
+        }
+
+        function aplicarEstado(classeEstado) {
+            const info = txtOcorrencia.value.trim();
+            if (info === "") {
+                alert("Por favor, introduza a legenda/ocorrência.");
+                return;
+            }
+            
+            estadoCanais[idCanalSelecionado] = { estado: classeEstado, ocorrencia: info };
+            salvarDados();
+
+            const card = document.getElementById(idCanalSelecionado);
+            card.className = `canal-card ${classeEstado}`;
+            card.innerHTML = `${nomeCanalSelecionado} <span class="detalhe-card">${info}</span>`;
+            
+            fecharModal();
+        }
+
+        // Função exclusiva para apenas editar o texto, mantendo a mesma cor (estado)
+        btnAtualizar.addEventListener('click', () => {
+            const info = txtOcorrencia.value.trim();
+            if (info === "") {
+                alert("A legenda não pode ficar vazia. Se pretender limpar, use o botão 'Libertar'.");
+                return;
+            }
+            const estadoAtual = estadoCanais[idCanalSelecionado].estado;
+            aplicarEstado(estadoAtual);
+        });
+
+        btnOcupar.addEventListener('click', () => aplicarEstado('ocupado'));
+        btnReservar.addEventListener('click', () => aplicarEstado('reservado'));
+        
+        btnLibertar.addEventListener('click', () => {
+            estadoCanais[idCanalSelecionado] = { estado: 'disponivel', ocorrencia: '' };
+            salvarDados();
+
+            const card = document.getElementById(idCanalSelecionado);
+            card.className = 'canal-card disponivel';
+            card.innerHTML = nomeCanalSelecionado;
+            
+            fecharModal();
+        });
+
+        btnCancelar.addEventListener('click', fecharModal);
+
+        // Execução inicial para esconder categorias limpas no arranque
+        verificarCategoriasVazias();
+    </script>
+</body>
+</html>
